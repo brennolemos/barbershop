@@ -5,7 +5,7 @@ import { Card, CardContent } from "./ui/card";
 const BookingItem = () => {
   return (
     <Card>
-      <CardContent className="px-5 py-0lin flex justify-between">
+      <CardContent className="px-5 py-0 flex justify-between">
         <div className="flex flex-col gap-2 py-5">
           <Badge className="bg-[#221c3d] text-primary hover:bg-[#221c3d] w-fit">
             Confirmado
