@@ -32,9 +32,11 @@ const BarbershopDetailsPage = async ({
     <div>
       <BarbershopInfo barbershop={barbershop} />
 
-      {barbershop.Service.map((service) => (
-        <ServiceItem key={service.id} service={service} />
-      ))}
+      <div className="px-5 flex flex-col gap-4 py-6">
+        {barbershop.Service.map((service) => (
+          <ServiceItem key={service.id} service={service} />
+        ))}
+      </div>
     </div>
   );
 };
