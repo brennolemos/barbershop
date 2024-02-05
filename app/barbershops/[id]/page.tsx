@@ -1,5 +1,6 @@
 import { db } from "@/app/_lib/prisma";
 import BarbershopInfo from "./_components/info";
+import ServiceItem from "./_components/service-item";
 
 type BarbershopDetailsPageProps = {
   params: {
@@ -18,13 +19,24 @@ const BarbershopDetailsPage = async ({
     where: {
       id: params.id,
     },
+    include: {
+      Service: true,
+    },
   });
 
   if (!barbershop) {
     return null;
   }
 
-  return <BarbershopInfo barbershop={barbershop} />;
+  return (
+    <div>
+      <BarbershopInfo barbershop={barbershop} />
+
+      {barbershop.Service.map((service) => (
+        <ServiceItem key={service.id} service={service} />
+      ))}
+    </div>
+  );
 };
 
 export default BarbershopDetailsPage;
