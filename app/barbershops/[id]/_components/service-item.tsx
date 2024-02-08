@@ -24,11 +24,16 @@ type ServiceItemProps = {
 
 const ServiceItem = ({ service, isAuthenticated }: ServiceItemProps) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [hour, setHour] = useState<string | undefined>();
 
   const handleClickBooking = async () => {
     if (!isAuthenticated) {
       return await signIn("google");
     }
+  };
+
+  const handleHourClick = (hour: string) => {
+    setHour(hour);
   };
 
   const timeList = useMemo(() => {
@@ -106,7 +111,20 @@ const ServiceItem = ({ service, isAuthenticated }: ServiceItemProps) => {
                     }}
                   />
 
-                  {/* {date && generateDayTimeList(date)} */}
+                  {date && (
+                    <div className="py-6 px-5 border-y border-solid border-secondary flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                      {timeList.map((time) => (
+                        <Button
+                          key={time}
+                          variant={hour === time ? "default" : "outline"}
+                          className="rounded-full"
+                          onClick={() => handleHourClick(time)}
+                        >
+                          {time}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
                 </SheetContent>
               </Sheet>
             </div>
