@@ -11,9 +11,11 @@ import {
   SheetTrigger,
 } from "@/app/_components/ui/sheet";
 import { Service } from "@prisma/client";
+import { ptBR } from "date-fns/locale";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { generateDayTimeList } from "../_helpers/hours";
 
 type ServiceItemProps = {
   service: Service;
@@ -28,6 +30,10 @@ const ServiceItem = ({ service, isAuthenticated }: ServiceItemProps) => {
       return await signIn("google");
     }
   };
+
+  const timeList = useMemo(() => {
+    return date ? generateDayTimeList(date) : [];
+  }, [date]);
 
   return (
     <Card>
@@ -72,7 +78,9 @@ const ServiceItem = ({ service, isAuthenticated }: ServiceItemProps) => {
                     mode="single"
                     selected={date}
                     onSelect={setDate}
-                    className="rounded-md border-b w-full"
+                    fromDate={new Date()}
+                    className="mt-6 border-b"
+                    locale={ptBR}
                     styles={{
                       head_cell: {
                         width: "100%",
@@ -97,6 +105,8 @@ const ServiceItem = ({ service, isAuthenticated }: ServiceItemProps) => {
                       },
                     }}
                   />
+
+                  {/* {date && generateDayTimeList(date)} */}
                 </SheetContent>
               </Sheet>
             </div>
