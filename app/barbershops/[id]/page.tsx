@@ -24,7 +24,7 @@ const BarbershopDetailsPage = async ({
       id: params.id,
     },
     include: {
-      Service: true,
+      services: true,
     },
   });
 
