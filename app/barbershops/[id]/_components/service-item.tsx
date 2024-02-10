@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/app/_components/ui/card";
 import {
   Sheet,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -29,7 +30,7 @@ const ServiceItem = ({
   barbershop,
   isAuthenticated,
 }: ServiceItemProps) => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(undefined);
   const [hour, setHour] = useState<string | undefined>();
 
   const handleClickBooking = async () => {
@@ -176,6 +177,12 @@ const ServiceItem = ({
                       </CardContent>
                     </Card>
                   </div>
+
+                  <SheetFooter className="px-5">
+                    <Button disabled={!hour || !date} className="w-full">
+                      Confirmar reserva
+                    </Button>
+                  </SheetFooter>
                 </SheetContent>
               </Sheet>
             </div>
