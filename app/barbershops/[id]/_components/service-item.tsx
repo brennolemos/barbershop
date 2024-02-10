@@ -13,11 +13,12 @@ import {
 } from "@/app/_components/ui/sheet";
 import { Barbershop, Service } from "@prisma/client";
 import { ptBR } from "date-fns/locale";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { generateDayTimeList } from "../_helpers/hours";
-import { format } from "date-fns";
+import { format, setHours, setMinutes } from "date-fns";
+import { saveBooking } from "../_actions/save-booking";
 
 type ServiceItemProps = {
   service: Service;
@@ -33,6 +34,8 @@ const ServiceItem = ({
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [hour, setHour] = useState<string | undefined>();
 
+  const { data } = useSession();
+
   const handleClickBooking = async () => {
     if (!isAuthenticated) {
       return await signIn("google");
@@ -46,6 +49,28 @@ const ServiceItem = ({
 
   const handleHourClick = (time: string) => {
     setHour(time);
+  };
+
+  const handleBookingSubmit = async () => {
+    try {
+      if (!hour || !date || !data?.user) return;
+
+      const [dateHours, dateMinutes] = hour.split(":");
+
+      const newDate = setMinutes(
+        setHours(date, Number(dateHours)),
+        Number(dateMinutes),
+      );
+
+      await saveBooking({
+        serviceId: service.id,
+        barbershopId: barbershop.id,
+        date: newDate,
+        userId: (data.user as any).id,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const timeList = useMemo(() => {
@@ -179,7 +204,11 @@ const ServiceItem = ({
                   </div>
 
                   <SheetFooter className="px-5">
-                    <Button disabled={!hour || !date} className="w-full">
+                    <Button
+                      onClick={handleBookingSubmit}
+                      disabled={!hour || !date}
+                      className="w-full"
+                    >
                       Confirmar reserva
                     </Button>
                   </SheetFooter>
