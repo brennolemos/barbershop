@@ -19,6 +19,7 @@ import { useMemo, useState } from "react";
 import { generateDayTimeList } from "../_helpers/hours";
 import { format, setHours, setMinutes } from "date-fns";
 import { saveBooking } from "../_actions/save-booking";
+import { Loader2 } from "lucide-react";
 
 type ServiceItemProps = {
   service: Service;
@@ -33,6 +34,8 @@ const ServiceItem = ({
 }: ServiceItemProps) => {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [hour, setHour] = useState<string | undefined>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sheetIsOpen, setSheetIsOpen] = useState(false);
 
   const { data } = useSession();
 
@@ -52,6 +55,8 @@ const ServiceItem = ({
   };
 
   const handleBookingSubmit = async () => {
+    setIsSubmitting(true);
+
     try {
       if (!hour || !date || !data?.user) return;
 
@@ -68,8 +73,12 @@ const ServiceItem = ({
         date: newDate,
         userId: (data.user as any).id,
       });
+
+      setSheetIsOpen(false);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -104,7 +113,7 @@ const ServiceItem = ({
                 }).format(Number(service.price))}
               </p>
 
-              <Sheet>
+              <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
                 <SheetTrigger asChild>
                   <Button variant="secondary" onClick={handleClickBooking}>
                     Reservar
@@ -206,9 +215,12 @@ const ServiceItem = ({
                   <SheetFooter className="px-5">
                     <Button
                       onClick={handleBookingSubmit}
-                      disabled={!hour || !date}
+                      disabled={!hour || !date || isSubmitting}
                       className="w-full"
                     >
+                      {isSubmitting && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
                       Confirmar reserva
                     </Button>
                   </SheetFooter>
