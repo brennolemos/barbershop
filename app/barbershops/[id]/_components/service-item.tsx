@@ -125,7 +125,7 @@ const ServiceItem = ({
     if (!date) return;
 
     const refreshAvailableHours = async () => {
-      const _dayBookings = await getDayBookings(date);
+      const _dayBookings = await getDayBookings(date, barbershop.id);
 
       setDayBookings(_dayBookings);
     };
