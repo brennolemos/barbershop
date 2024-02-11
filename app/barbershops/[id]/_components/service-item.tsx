@@ -11,17 +11,18 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/app/_components/ui/sheet";
-import { Barbershop, Service } from "@prisma/client";
+import { Barbershop, Booking, Service } from "@prisma/client";
 import { ptBR } from "date-fns/locale";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { generateDayTimeList } from "../_helpers/hours";
 import { format, setHours, setMinutes } from "date-fns";
 import { saveBooking } from "../_actions/save-booking";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { getDayBookings } from "../_actions/get-day-bookings";
 
 type ServiceItemProps = {
   service: Service;
@@ -38,9 +39,9 @@ const ServiceItem = ({
   const [hour, setHour] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
+  const [dayBookings, setDayBookings] = useState<Booking[]>([]);
 
   const router = useRouter();
-
   const { data } = useSession();
 
   const handleClickBooking = async () => {
@@ -99,7 +100,37 @@ const ServiceItem = ({
   };
 
   const timeList = useMemo(() => {
-    return date ? generateDayTimeList(date) : [];
+    if (!date) return [];
+
+    return generateDayTimeList(date).filter((time) => {
+      const [timeHour, timeMinutes] = time.split(":");
+
+      const booking = dayBookings.find((booking) => {
+        const bookingHours = booking.date.getHours();
+        const bookingMinutes = booking.date.getMinutes();
+
+        return (
+          bookingHours === Number(timeHour) &&
+          bookingMinutes === Number(timeMinutes)
+        );
+      });
+
+      if (!booking) return true;
+
+      return false;
+    });
+  }, [date, dayBookings]);
+
+  useEffect(() => {
+    if (!date) return;
+
+    const refreshAvailableHours = async () => {
+      const _dayBookings = await getDayBookings(date);
+
+      setDayBookings(_dayBookings);
+    };
+
+    refreshAvailableHours();
   }, [date]);
 
   return (
